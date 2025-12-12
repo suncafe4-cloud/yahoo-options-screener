@@ -1,0 +1,38 @@
+name: Daily Options Premium Screener
+
+on:
+  schedule:
+    # Runs every day at 6:05am PT (14:05 UTC)
+    - cron: '5 14 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-screener:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Yahoo options screener
+        run: |
+          python yahoo_options_premium_screener.py
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: options-results
+          path: |
+            summary_top.csv
+            candidates_csp.csv
+            candidates_cc.csv
